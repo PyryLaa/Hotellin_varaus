@@ -8,7 +8,7 @@
 //T‰m‰n kirjaston avulla voidaan k‰ytt‰‰ mm. isdigit() funktiota syˆtteen tarkistukseen
 #include <ctype.h>
 
-struct Hotellihuone {
+struct Hotellihuone { //Jokainen hotellihuone on struct joka pit‰‰ sis‰ll‰‰n tiedot huoneen varaajasta yms. Varaustilanne muuttuu true jos huoneeseen on tehty varaus
 	bool varaustilanne;
 	int varausnumero;
 	int yot;
@@ -16,39 +16,50 @@ struct Hotellihuone {
 	std::string varaaja, sposti, puhnro;
 };
 
-Hotellihuone huoneiden_teko();
-int main_menu();
-Hotellihuone huoneen_varaus(Hotellihuone h[]);
-void varauksen_tarkastelu(Hotellihuone h[]);
+const int huonemaara = 260; //Hotellihuonetaulukon koko eli hotellihuoneiden m‰‰r‰
+Hotellihuone huone_lista[huonemaara];
 
-const int huonemaara = 260; //Hotellihuone taulukon koko eli hotellihuoneiden m‰‰r‰
+//Aliohjelmien alustus
+Hotellihuone Huoneiden_teko();
+int Main_menu();
+Hotellihuone Huoneen_varaus(Hotellihuone h[]);
+void Varauksen_tarkastelu(Hotellihuone h[]);
+
+ 
 
 
 
 int main() { //Main funktio vain kutsuu muita aliohjelmia riippuen mit‰ main_menu aliohjelma palauttaa
+
 	setlocale(LC_ALL, "fi_FI"); //Setlocale antaa mahdollisuuden k‰ytt‰‰ ‰‰kkˆsi‰ ohjelman tulostuksissa
-	Hotellihuone huone_lista[huonemaara];
-	for (int i = 0; i < huonemaara; i++) {
-		huone_lista[i] = huoneiden_teko();
+
+	
+
+	for (int i = 0; i < huonemaara; i++) { //Silmukassa kutsutaan jokaisella hotellihuoneella aliohjelmaa jossa annetaan huoneen tiedoille jokin alkuarvo
+		huone_lista[i] = Huoneiden_teko();
 	}
+
 	while (true) {
-		int palautus = main_menu();
+		int palautus = Main_menu();
 
 		if (palautus == 1) {
-			huoneen_varaus(huone_lista);
+			Huoneen_varaus(huone_lista);
 		}
 		else if (palautus == 2) {
-			varauksen_tarkastelu(huone_lista);
+			Varauksen_tarkastelu(huone_lista);
 		}
-		else if (palautus == 3){
+		else if (palautus == 3) {
 			std::cout << "N‰kemiin!";
 			break;
 		}
 	}
 	return 0;
 }
-int main_menu() {//P‰‰valikko aliohjelma, t‰st‰ liikutaan muihin aliohjelmiin mainin kautta k‰ytt‰j‰n valinnan mukaisesti
+
+
+int Main_menu() {//P‰‰valikko aliohjelma, t‰st‰ liikutaan muihin aliohjelmiin mainin kautta k‰ytt‰j‰n valinnan mukaisesti
 	char valinta;
+
 	do {
 		std::cout << "Tervetuloa Rantahotellin varausj‰rjestelm‰‰n!\n";
 		std::cout << "Mit‰ haluaisit tehd‰? (Valitse numeron‰pp‰imill‰ ja painamalla enter)\n";
@@ -56,14 +67,18 @@ int main_menu() {//P‰‰valikko aliohjelma, t‰st‰ liikutaan muihin aliohjelmiin ma
 		std::cin >> valinta;
 
 		int tarkistus = isdigit(valinta); //Tarkistetaan syˆte isdigit() funktiolla, funktio k‰ytt‰‰ parametrina char tyyppi‰ ja palauttaa int tyypin 0 tai joku muu kuin 0 riippuen onko false vai true
-		
-		if (tarkistus == 0) {
+
+		while (tarkistus == 0) {
 			std::cout << "Virheellinen syˆte, syˆt‰ 1, 2 tai 3 ja paina enter. \n";
 			std::cout << std::endl;
-			continue;
+			std::cin.clear();
+			std::cin.ignore(80, '\n');
+			std::cout << "1. Varaa huone\n2. Tarkastele varausta\n3. Sulje j‰rjestelm‰\n";
+			std::cin >> valinta;
+			tarkistus = isdigit(valinta);
 		}
 
-		else if (valinta == '1') {
+		if (valinta == '1') {
 			return 1;
 		}
 		else if (valinta == '2') {
@@ -76,7 +91,8 @@ int main_menu() {//P‰‰valikko aliohjelma, t‰st‰ liikutaan muihin aliohjelmiin ma
 
 }
 
-Hotellihuone huoneiden_teko() { //T‰m‰ aliohjelma alustaa hotellihuone taulukon joillain l‰htˆarvoilla, jotka muuttuvat kun k‰ytt‰j‰ antaa uudet tiedot
+
+Hotellihuone Huoneiden_teko() { //T‰m‰ aliohjelma alustaa hotellihuone taulukon joillain l‰htˆarvoilla, jotka muuttuvat kun k‰ytt‰j‰ antaa uudet tiedot
 	//Kun taulukko on alustettu t‰ss‰ aliohjelmassa, tiedot s‰ilyv‰t siell‰ niin kauan kuin ohjelma on k‰ynniss‰
 	Hotellihuone h;
 	h.hinta = 0;
@@ -88,11 +104,13 @@ Hotellihuone huoneiden_teko() { //T‰m‰ aliohjelma alustaa hotellihuone taulukon 
 
 	return h;
 }
-Hotellihuone huoneen_varaus(Hotellihuone h[]) {
+
+
+Hotellihuone Huoneen_varaus(Hotellihuone h[]) {
 	//T‰ss‰ tehd‰‰n varaus, kysyt‰‰n varaajan tiedot ja tallennetaan ne hotellihuone taulukkoon
 	int huonenumero, tarkistus;
 	char henkilot, valinta;
-	
+
 	do {
 		std::cout << "Haluatko 1 vai 2 hengen huoneen?\n";
 		std::cin >> henkilot;
@@ -101,9 +119,11 @@ Hotellihuone huoneen_varaus(Hotellihuone h[]) {
 		if (tarkistus == 0) {
 			std::cout << "Virheellinen syˆte, syˆt‰ 1 tai 2 ja paina enter.\n";
 			std::cout << std::endl;
+			std::cin.clear();
+			std::cin.ignore(80, '\n');
 		}
 	} while (tarkistus == 0);
-	
+
 
 	if (henkilot == '1') {
 		do {
@@ -111,15 +131,19 @@ Hotellihuone huoneen_varaus(Hotellihuone h[]) {
 			std::cin >> valinta;
 
 			tarkistus = isdigit(valinta);
-			if (tarkistus == 0) {
+			while (tarkistus == 0) {
 				std::cout << "Virheellinen syˆte, valitse 1 tai 2 ja paina enter.\n";
-				continue;
+				std::cin.clear();
+				std::cin.ignore(80, '\n');
+				std::cin >> valinta;
+				tarkistus = isdigit(valinta);
 			}
-			else if (valinta == '1') {
-				do {
+			if (valinta == '1') {
+				do { //Satunnaisgeneroi huonenumeron ja tarkistaa onko t‰lle tietylle numerolle jo varattu huone. Yritt‰‰ niin kauan kunnes vapaa huone lˆytyy
 					srand(time(0));
 					huonenumero = 1 + (rand() % 129);
-				} while (h[huonenumero].varaustilanne == true);
+				} while (h[huonenumero].varaustilanne == true); 
+
 				std::cout << "Huonenumerosi on: " << huonenumero;
 				std::cout << std::endl;
 				break;
@@ -127,7 +151,7 @@ Hotellihuone huoneen_varaus(Hotellihuone h[]) {
 			else if (valinta == '2') {
 				std::cout << "Valitse huonenumero (1-130)\n";
 				std::cin >> huonenumero;
-				while (h[huonenumero].varaustilanne == true) { //Tarkistetaan onko huone vapaana, jos ei ole, palataan p‰‰valikkoon
+				while (h[huonenumero].varaustilanne == true) { //Tarkistetaan onko huone vapaana
 					std::cout << "Valitettavasti huone ei ole vapaana, valitse toinen huone\n";
 					std::cout << "Valitse huonenumero (1-130)\n";
 					std::cin >> huonenumero;
@@ -135,12 +159,14 @@ Hotellihuone huoneen_varaus(Hotellihuone h[]) {
 				break;
 			}
 		} while (true);
-		
+
+		//T‰nne tullaan kun huonenumero on valittu onnistuneesti
+
 		h[huonenumero].varaustilanne = true;
 
 		//Varaajan tiedot
 		std::cout << "Anna nimesi: ";
-		std::cin.ignore();
+		std::cin.ignore(); //cin.ignore tarvitaan vain kerran, muuten seuraavista stringeist‰ puuttuu ensimm‰inen kirjain
 		std::getline(std::cin, h[huonenumero].varaaja);
 		std::cout << "Anna puhelinnumerosi (numero muotoa 0400123456, ei maakoodia): ";
 		std::getline(std::cin, h[huonenumero].puhnro);
@@ -150,17 +176,19 @@ Hotellihuone huoneen_varaus(Hotellihuone h[]) {
 		std::cout << "Kuinka monta yˆt‰ haluat yˆpy‰ hotellissa? Hinta on 100e per yˆ.\n";
 		std::cin >> h[huonenumero].yot;
 		h[huonenumero].hinta = h[huonenumero].yot * 100;
-		srand(time(0));
+
+		srand(time(0)); //srand time k‰ytt‰‰ aikaa satunnaisgeneroinnin seedin‰, eli generoitu luku perustuu aina ajan hetkeen. T‰ten saadaan aina eri luku.
 		h[huonenumero].varausnumero = 10000 + (rand() % 89999);
 
 		std::cout << "\nT‰ss‰ varauksesi tiedot, otathan n‰m‰ ylˆs!\n";
-		std::cout << "Nimi: " << h[huonenumero].varaaja << "\nPuhelinnumero: "<< h[huonenumero].puhnro<< "\nS‰hkˆposti: " << h[huonenumero].sposti << "\nHuoneen numero: "<<
-			huonenumero<< "\n÷iden m‰‰r‰: " << h[huonenumero].yot<< "\nVarausnumero: " << h[huonenumero].varausnumero
-			<< "\nYˆpymisen hinta: " << h[huonenumero].hinta << " euroa\n"<<std::endl;
-		return h[huonenumero];
+		std::cout << "Nimi: " << h[huonenumero].varaaja << "\nPuhelinnumero: " << h[huonenumero].puhnro << "\nS‰hkˆposti: " << h[huonenumero].sposti << "\nHuoneen numero: " <<
+			huonenumero << "\n÷iden m‰‰r‰: " << h[huonenumero].yot << "\nVarausnumero: " << h[huonenumero].varausnumero
+			<< "\nYˆpymisen hinta: " << h[huonenumero].hinta << " euroa\n" << std::endl;
+
+		return h[huonenumero];//Palautetaan varatun huoneen tiedot hotellihuonetaulukkoon
 	}
-	if (henkilot == '2') { //Kahden hengen huoneen varaaminen, muuten sama kuin edellinen mutta hinta ja huonenumerot eri
-		
+	if (henkilot == '2') { //Kahden hengen huoneen varaaminen, muuten sama kuin yhden hengen mutta hinta ja huonenumerot eri
+
 		do {
 			std::cout << "Haluatko valita huonenumeron itse vai annatko koneen valita sen?\n" << "1. Tietokone valitsee\n2. Itse\n";
 			std::cin >> valinta;
@@ -182,7 +210,7 @@ Hotellihuone huoneen_varaus(Hotellihuone h[]) {
 			else if (valinta == '2') {
 				std::cout << "Valitse huonenumero (131-260)\n";
 				std::cin >> huonenumero;
-				while (h[huonenumero].varaustilanne == true) { //Tarkistetaan onko huone vapaana, jos ei ole, palataan p‰‰valikkoon
+				while (h[huonenumero].varaustilanne == true) { //Tarkistetaan onko huone vapaana
 					std::cout << "Valitettavasti huone ei ole vapaana, valitse toinen huone\n";
 					std::cout << "Valitse huonenumero (131-260)\n";
 					std::cin >> huonenumero;
@@ -190,12 +218,13 @@ Hotellihuone huoneen_varaus(Hotellihuone h[]) {
 				break;
 			}
 		} while (true);
-		
 
-		
+		//T‰nne tullaan kun huonenumero on valittu onnistuneesti
+
 		h[huonenumero].varaustilanne = true;
 
 		//Varaajan tiedot
+
 		std::cout << "Anna nimesi: ";
 		std::cin.ignore(); //cin.ignore() vain kerran, muuten seuraavista stringeist‰ puuttuu ensimm‰inen merkki
 		std::getline(std::cin, h[huonenumero].varaaja);
@@ -207,70 +236,85 @@ Hotellihuone huoneen_varaus(Hotellihuone h[]) {
 		std::cout << "Kuinka monta yˆt‰ haluat yˆpy‰ hotellissa? Hinta on 150e per yˆ.\n";
 		std::cin >> h[huonenumero].yot;
 		h[huonenumero].hinta = h[huonenumero].yot * 150;
+
 		srand(time(0));
 		h[huonenumero].varausnumero = 10000 + (rand() % 89999);
 
 		std::cout << "\nT‰ss‰ varauksesi tiedot, otathan n‰m‰ ylˆs!\n";
 		std::cout << "Nimi: " << h[huonenumero].varaaja << "\nPuhelinnumero: " << h[huonenumero].puhnro << "\nS‰hkˆposti: " << h[huonenumero].sposti << "\nHuoneen numero: " <<
 			huonenumero << "\n÷iden m‰‰r‰: " << h[huonenumero].yot << "\nVarausnumero: " << h[huonenumero].varausnumero
-			<< "\nYˆpymisen hinta: " << h[huonenumero].hinta << " euroa\n"<<std::endl;
-		
+			<< "\nYˆpymisen hinta: " << h[huonenumero].hinta << " euroa\n" << std::endl;
+
 		return h[huonenumero];
 	}
 
 }
-void varauksen_tarkastelu(Hotellihuone h[]) { //T‰ss‰ aliohjelmassa voi hakea tehtyj‰ varauksia varausnumerolla tai nimell‰. Jos varausta ei lˆydy, kertoo ohjelma t‰m‰n ja palaa p‰‰valikkoon
+void Varauksen_tarkastelu(Hotellihuone h[]) { //T‰ss‰ aliohjelmassa voi hakea tehtyj‰ varauksia varausnumerolla tai nimell‰. Jos varausta ei lˆydy, kertoo ohjelma t‰m‰n ja palaa p‰‰valikkoon
 	int varausnumero, i, tarkistus;
 	std::string nimi;
 	char valinta;
 	bool lippu = false; //T‰t‰ muuttujaa k‰ytet‰‰n tarkistamaan, onko yht‰‰n varausta lˆytynyt. Mik‰li arvo pysyy false, ei varauskai annetuilla tiedoilla lˆytynyt
 
-	std::cout << "Haluatko hakea nimell‰ vai varausnumerolla?" << std::endl << "1. Nimell‰\n2. Varausnumerolla\n";
-	std::cin >> valinta;
-	tarkistus = isdigit(valinta);
+	do {
 
-	if (valinta == '1') {
-		std::cout << "\nAnna nimi mill‰ haetaan: ";
-		std::cin.ignore();
-		std::getline(std::cin, nimi);
+		std::cout << "Haluatko hakea nimell‰ vai varausnumerolla?" << std::endl << "1. Nimell‰\n2. Varausnumerolla\n";
+		std::cin >> valinta;
+		tarkistus = isdigit(valinta);
 
-		for (i = 0; i < huonemaara; i++) {
-			if (h[i].varaaja == nimi) {
-				std::cout << "\nT‰ss‰ varauksen tiedot: \n";
-				std::cout << "Nimi: " << h[i].varaaja << "\nPuhelinnumero: " << h[i].puhnro << "\nS‰hkˆposti: " << h[i].sposti
-					<< "\nHuoneen numero: "<< i << "\n÷iden m‰‰r‰: " << h[i].yot << "\nVarausnumero: " << h[i].varausnumero
-					<< "\nYˆpymisen hinta: " << h[i].hinta << " euroa\n";
-				std::cout << std::endl;
-				lippu = true;
-				
+		while (tarkistus == 0) {
+			std::cout << "Virheellinen syˆte, paina 1 tai 2 ja enter!\n";
+			std::cin.clear();
+			std::cin.ignore(80, '\n');
+			std::cin >> valinta;
+			tarkistus = isdigit(valinta);
+		}
+
+		if (valinta == '1') {
+			std::cout << "\nAnna nimi mill‰ haetaan: ";
+			std::cin.ignore();
+			std::getline(std::cin, nimi);
+
+			for (i = 0; i < huonemaara; i++) { //K‰y l‰pi hotellihuonetaulukon ja tulostaa kaikki annetulla nimell‰ lˆytyneet varaukset
+				if (h[i].varaaja == nimi) {
+					int laskuri = 1; //Laskuri kertoo monennen varauksen tiedot ovat kyseess‰
+					std::cout << "\nT‰ss‰ varauksen"<< laskuri << "tiedot: \n";
+					laskuri++;
+					std::cout << "Nimi: " << h[i].varaaja << "\nPuhelinnumero: " << h[i].puhnro << "\nS‰hkˆposti: " << h[i].sposti
+						<< "\nHuoneen numero: " << i << "\n÷iden m‰‰r‰: " << h[i].yot << "\nVarausnumero: " << h[i].varausnumero
+						<< "\nYˆpymisen hinta: " << h[i].hinta << " euroa\n";
+					std::cout << std::endl;
+					lippu = true;
+
+				}
+
 			}
-			
-		}
-		if (lippu == false) {
-			std::cout << "\nValitettavasti nimell‰ " << nimi << " ei lˆytynyt yht‰‰n varausta.\n";
-			std::cout << std::endl;
-		}
-	}
-	if (valinta == '2') {
-		std::cout << "\nAnna varausnumero mill‰ haetaan: ";
-		std::cin >> varausnumero;
-
-		for (i = 0; i < huonemaara; i++) {
-			if (h[i].varausnumero == varausnumero) {
-				std::cout << "\nT‰ss‰ varauksen tiedot: \n";
-				std::cout << "Nimi: " << h[i].varaaja << "\nPuhelinnumero: " << h[i].puhnro << "\nS‰hkˆposti: " << h[i].sposti
-					<< "\nHuoneen numero: " << i << "\n÷iden m‰‰r‰: " << h[i].yot << "\nVarausnumero: " << h[i].varausnumero
-					<< "\nYˆpymisen hinta: " << h[i].hinta << " euroa\n";
+			if (lippu == false) {
+				std::cout << "\nValitettavasti nimell‰ " << nimi << " ei lˆytynyt yht‰‰n varausta.\n";
 				std::cout << std::endl;
-				lippu == true;
 			}
-			
-			
 		}
-		if (lippu == false) {
-			std::cout << "Valitettavasti varausnumerolla " << varausnumero << " ei lˆytynyt yht‰‰n varausta.\n";
-			std::cout << std::endl;
-		}
-	}
+		if (valinta == '2') {
+			std::cout << "\nAnna varausnumero mill‰ haetaan: ";
+			std::cin >> varausnumero;
 
+			for (i = 0; i < huonemaara; i++) {//K‰y l‰pi huonetaulukon ja tulostaa annetulla varausnumerolla tehdyn varauksen
+				//T‰‰ll‰ ei laskuria koska yksi varausnumero voi olla vain yhdell‰ huoneella, ei useammalla
+
+				if (h[i].varausnumero == varausnumero) {
+					std::cout << "\nT‰ss‰ varauksen tiedot: \n";
+					std::cout << "Nimi: " << h[i].varaaja << "\nPuhelinnumero: " << h[i].puhnro << "\nS‰hkˆposti: " << h[i].sposti
+						<< "\nHuoneen numero: " << i << "\n÷iden m‰‰r‰: " << h[i].yot << "\nVarausnumero: " << h[i].varausnumero
+						<< "\nYˆpymisen hinta: " << h[i].hinta << " euroa\n";
+					std::cout << std::endl;
+					lippu = true;
+				}
+
+
+			}
+			if (lippu == false) {
+				std::cout << "Valitettavasti varausnumerolla " << varausnumero << " ei lˆytynyt yht‰‰n varausta.\n";
+				std::cout << std::endl;
+			}
+		}
+	} while (lippu == false);
 }
